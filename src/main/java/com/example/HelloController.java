@@ -8,6 +8,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.io.IOException;
+
 /**
  * Controller layer: mediates between the view (FXML) and the model.
  * Handles updates of the chat-window.
@@ -40,11 +42,8 @@ public class HelloController {
     //Metoden körs automatiskt när appen startar
     @FXML
     private void initialize() {
-        //todo: Initialisera uppkopplingsknapparna för server-anslutning
-        //todo: metod för nätverksuppkoppling?
 
         //Sätter ursprungstillståndet (default) för skicka-knappen
-
         updateSendButtonState();
 
         //Lägger till en lyssnare för att uppdatera knappen vid inmatning av text
@@ -54,8 +53,20 @@ public class HelloController {
         messageInput.setOnAction((event) -> sendMessageToModel());
         sendButton.setOnAction(event -> sendMessageToModel());
 
-        disconnectFromServer.setOnAction(event -> setDisconnectFromServer());
-        connectToServer.setOnAction(event -> setConnectToServer());
+        disconnectFromServer.setOnAction(event -> {
+            try {
+                setDisconnectFromServer();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        connectToServer.setOnAction(event -> {
+            try {
+                setConnectToServer();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         disconnectFromServer.setDisable(true);
 
@@ -129,7 +140,7 @@ public class HelloController {
     }
 
     //Starta prenumeration via model och uppdaterar button
-    public void setConnectToServer() {
+    public void setConnectToServer() throws IOException{
         if(disconnectFromServer.isDisable()) {
             model.receiveMessage();
             connectToServer.setDisable(true);
@@ -139,7 +150,7 @@ public class HelloController {
     }
 
     //Stoppar prenumerationen och uppdaterar button
-    public void setDisconnectFromServer() {
+    public void setDisconnectFromServer() throws IOException {
         model.stopSubscription();
         connectToServer.setDisable(false);
         disconnectFromServer.setDisable(true);

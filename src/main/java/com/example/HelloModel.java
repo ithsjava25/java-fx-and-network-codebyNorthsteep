@@ -73,13 +73,10 @@ if(subscription != null && subscription.isOpen()) {
 
     }
 
-    public void stopSubscription() {
+    public void stopSubscription() throws IOException {
         if (subscription != null && subscription.isOpen())
-            try{
             subscription.close();
-        } catch(IOException e) {
-                System.out.println("Error closing subscription" + e.getMessage());
-            }
+
     }
 }
 

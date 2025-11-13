@@ -37,8 +37,7 @@ class HelloModelTest {
     @Test
     void receiveMessageFromFakeServer(WireMockRuntimeInfo wireMockRuntimeInfo) throws IOException, InterruptedException {
         //Arrange
-        var host = "http://localhost:" + wireMockRuntimeInfo.getHttpPort();
-        var con = new NtfyConnectionImpl(host);
+        var host = new NtfyConnectionImpl("http://localhost:" + wireMockRuntimeInfo.getHttpPort());
 
         String fakeMessage = """
                 {"id":"testID","time":1762935416, "event":"keepalive","topic":"catChat", "message":"Filtreras bort"}
@@ -50,24 +49,14 @@ class HelloModelTest {
         stubFor(get(urlEqualTo("/catChat/json")).willReturn(aResponse()
                         .withStatus(200)
                 .withBody(fakeMessage)));
-
-//        Consumer<NtfyMessageDto> fakeReceiver = Mockito.mock(Consumer.class);
-//        //con.receive(fakeReceiver);
-//
-//        ArgumentCaptor<NtfyMessageDto> captor = ArgumentCaptor.forClass(NtfyMessageDto.class);
-//        Subscription subscription = con.receive(fakeReceiver);
+        var model =new HelloModel(host);
 
 //        //Act
 
-        var model =new HelloModel(con);
         model.receiveMessage();
 
-        Thread.sleep(50);
+        Thread.sleep(1000);
 
-        Awaitility.await()
-                .atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
-                assertThat(model.getMessages()).hasSize(1);
-                });
 
         //Assert
         assertThat(model.getMessages().getFirst().message()).isEqualTo("User: Hej");

@@ -4,6 +4,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import javafx.application.Platform;
 import tools.jackson.databind.ObjectMapper;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -53,6 +54,22 @@ public class NtfyConnectionImpl implements NtfyConnection {
 
     @Override
     public boolean sendFile(Path file, String messageWithFile) {
+        String fileMessage = Objects.requireNonNull(messageWithFile);
+        HttpRequest.BodyPublisher fileBody =  HttpRequest.BodyPublishers.ofString(file.toString());
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(hostName + "/catChat"))
+                .header("Filename", file.getFileName().toString())
+                .header("Filename", "You received a file:" + fileMessage)
+                .PUT(fileBody)
+                .build();
+        try {
+            var response = http.send(request, HttpResponse.BodyHandlers.discarding());
+            return true;
+        } catch (IOException e) {
+            System.out.println("Error sending file");;
+        } catch (InterruptedException e) {
+            System.out.println("Sending file interrupted");;
+        }
         return false;
     }
 
@@ -72,7 +89,7 @@ public class NtfyConnectionImpl implements NtfyConnection {
                         .map(s -> mapper.readValue(s, NtfyMessageDto.class))
                         .filter(message -> message.event().equals("message"))
                         .peek(System.out::println)
-                        .forEach(message -> Platform.runLater(()-> messageHandler.accept(message))));
+                        .forEach(message -> runOnFx(()-> messageHandler.accept(message))));
         return new Subscription() {
             @Override
             public void close() {
@@ -84,5 +101,14 @@ public class NtfyConnectionImpl implements NtfyConnection {
                 return !connected.isDone();
             }
         };
+    }
+    private static void runOnFx(Runnable task) {
+        try {
+            if (Platform.isFxApplicationThread()) task.run();
+            else Platform.runLater(task);
+        } catch (IllegalStateException notInitialized) {
+            // JavaFX toolkit not initialized (e.g., unit tests): run inline
+            task.run();
+        }
     }
 }
