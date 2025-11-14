@@ -34,7 +34,7 @@ public class HelloModel {
     public HelloModel(NtfyConnection connection) {
 
         this.connection = connection;
-        //subscription = receiveMessage(); //subscription startar automatiskt när modellen skapas
+
     }
 
     //getter från private, används av controller för att koppla til ListView
@@ -62,7 +62,7 @@ public class HelloModel {
 
     }
 
-    //Startar en prenumeration på inkommande meddelnaden,
+    //Startar en prenumeration på inkommande meddelanden,
     //Returnerar ett Subscription-objekt så den kan stoppas
     public Subscription receiveMessage() {
 if(subscription != null && subscription.isOpen()) {
