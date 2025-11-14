@@ -66,7 +66,7 @@ public class HelloModel {
     //Returnerar ett Subscription-objekt så den kan stoppas
     public Subscription receiveMessage() {
 if(subscription != null && subscription.isOpen()) {
-    return this.subscription;
+    return subscription;
 }
     return subscription = connection.receive(messages::add);
 

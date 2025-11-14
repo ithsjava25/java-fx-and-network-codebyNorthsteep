@@ -17,10 +17,6 @@ public class NtfyConnectionSpy implements NtfyConnection {
         return false;
     }
 
-    @Override
-    public boolean sendFile(Path file, String messageWithFile) {
-        return false;
-    }
 
     //Sparar en consumer och returnerar en falsk Subscription
     //Sätter consumer till null och returnerar att fake-servern är öppen, detta kan styras via booleanflaggan

@@ -7,12 +7,12 @@
 
     <top>
         <VBox alignment="CENTER" prefHeight="95.0" prefWidth="500.0" styleClass="top-bar">
-         <ToolBar prefHeight="40.0" prefWidth="200.0">
-           <items>
-             <Button fx:id="connectToServer"  mnemonicParsing="false" text="Koppla upp på server" styleClass="button"/>
-               <Button fx:id="disconnectFromServer" mnemonicParsing="false" text="Koppla ifrån server" styleClass="button"/>
-           </items>
-         </ToolBar>
+            <ToolBar prefHeight="40.0" prefWidth="200.0">
+                <Button fx:id="connectToServer" mnemonicParsing="false" text="Koppla upp på server"
+                        styleClass="connectionButton"/>
+                <Button fx:id="disconnectFromServer" mnemonicParsing="false" text="Koppla ifrån server"
+                        styleClass="connectionButton"/>
+            </ToolBar>
             <Label styleClass="title-bar" text="CatCode Messenger" />
         </VBox>
     </top>
@@ -24,7 +24,7 @@
     <bottom>
         <HBox alignment="CENTER_LEFT" styleClass="input-bar">
             <TextField fx:id="messageInput" promptText="Skriv ett meddelande..." styleClass="text-field" HBox.hgrow="ALWAYS" />
-            <Button fx:id="sendButton" text="Skicka" />
+            <Button fx:id="sendButton" text="           " styleClass="sendButton"/>
         </HBox>
     </bottom>
 

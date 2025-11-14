@@ -3,8 +3,6 @@ package com.example;
 import io.github.cdimascio.dotenv.Dotenv;
 import javafx.application.Platform;
 import tools.jackson.databind.ObjectMapper;
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -48,27 +46,6 @@ public class NtfyConnectionImpl implements NtfyConnection {
             System.out.println("Error sending message");
         } catch (InterruptedException e) {
             System.out.println("Sending message interrupted");
-        }
-        return false;
-    }
-
-    @Override
-    public boolean sendFile(Path file, String messageWithFile) {
-        String fileMessage = Objects.requireNonNull(messageWithFile);
-        HttpRequest.BodyPublisher fileBody =  HttpRequest.BodyPublishers.ofString(file.toString());
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(hostName + "/catChat"))
-                .header("Filename", file.getFileName().toString())
-                .header("Filename", "You received a file:" + fileMessage)
-                .PUT(fileBody)
-                .build();
-        try {
-            var response = http.send(request, HttpResponse.BodyHandlers.discarding());
-            return true;
-        } catch (IOException e) {
-            System.out.println("Error sending file");;
-        } catch (InterruptedException e) {
-            System.out.println("Sending file interrupted");;
         }
         return false;
     }
