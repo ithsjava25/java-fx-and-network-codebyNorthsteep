@@ -56,7 +56,7 @@ public class NtfyConnectionImpl implements NtfyConnection {
         String inputMessage = Objects.requireNonNull(message);
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(inputMessage))
-                .header("Cache", "no")
+                .header("Cache-Control", "no-cache")
                 .uri(URI.create(hostName + "/catChat"))
                 .build();
         try {
@@ -72,7 +72,7 @@ public class NtfyConnectionImpl implements NtfyConnection {
 
 
     /**
-     * Creates an asynchronous (multi-threaded) GET stream to receive messages from the server.
+     * Creates an asynchronous (multithreaded) GET stream to receive messages from the server.
      * Each line received is converted to an NtfyMessageDto and passed to the message handler.
      *
      * @param messageHandler The consumer that processes each valid incoming message (i.e., adds it to the model).

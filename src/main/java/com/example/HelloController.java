@@ -129,8 +129,9 @@ public class HelloController {
      */
     private void sendMessageToModel() {
         String outgoingMessage = messageInput.getText().trim();
-        //Kontrollerar om text-fältet är tomt
-        if (!outgoingMessage.isEmpty()) {
+        boolean isConnected = !disconnectFromServer.isDisabled();
+        //Skicka bara om det finns text och vi är uppkopplade
+        if (isConnected && !outgoingMessage.isEmpty()) {
             model.sendMessage("User: " + outgoingMessage);
             //tömmer sedan fältet där text matas in(prompt-meddelande visas igen)
             messageInput.clear();
