@@ -1,39 +1,48 @@
 package com.example;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
-import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @WireMockTest
 class HelloModelTest {
 
+    /**
+     * Verifies that calling sendMessage() on the model correctly delegates the
+     * message string to the underlying NtfyConnection implementation.
+     * The model's internal messageToSend() is ignored in this test using a spy.
+     */
     @Test
     void sendMessageCallsConnectionWithMessageToSend() {
         //Arrange
         var spy = new NtfyConnectionSpy();
-                var model = new HelloModel(spy);
-                //Act
-                model.setMessageToSend("");
+        var model = new HelloModel(spy);
 
-                model.sendMessage("Hello World");
-//Assert
-                assertThat(spy.message).isEqualTo("Hello World");
+        //Act
+        model.setMessageToSend("");
+        model.sendMessage("Hello World");
+
+        //Assert
+        assertThat(spy.message).isEqualTo("Hello World");
     }
 
+    /**
+     * Tests the message receiving functionality by simulating a JSON stream from
+     * a fake Ntfy server using WireMock.
+     * Verifies that the model filters out 'keepalive' events and correctly processes
+     * the 'message' event, adding it to the ObservableList.
+     * Uses a polling loop to wait for the asynchronous message processing to complete.
+     *
+     * @param wireMockRuntimeInfo Provides port information for the simulated server.
+     * @throws IOException          If an I/O error occurs during setup.
+     * @throws InterruptedException If the waiting thread is interrupted.
+     */
     @Test
     void receiveMessageFromFakeServer(WireMockRuntimeInfo wireMockRuntimeInfo) throws IOException, InterruptedException {
         //Arrange
@@ -47,9 +56,9 @@ class HelloModelTest {
 
         //Simulerar en server
         stubFor(get(urlEqualTo("/catChat/json")).willReturn(aResponse()
-                        .withStatus(200)
+                .withStatus(200)
                 .withBody(fakeMessage)));
-        var model =new HelloModel(host);
+        var model = new HelloModel(host);
 
 //        //Act
 
@@ -64,28 +73,45 @@ class HelloModelTest {
         model.stopSubscription(); //Stänger anslutningen
     }
 
+    /**
+     * Verifies that calling sendMessage() sends a correct HTTP POST request
+     * to the simulated server, including the message content in the request body.
+     *
+     * @param wmRuntimeInfo Provides port information for the simulated server.
+     */
     @Test
     void sendMessageToFakeServer(WireMockRuntimeInfo wmRuntimeInfo) {
+        //Arrange
         var con = new NtfyConnectionImpl("http://localhost:" + wmRuntimeInfo.getHttpPort());
         var model = new HelloModel(con);
         model.setMessageToSend("");
         stubFor(post("/catChat").willReturn(ok()));
 
+        //Act
         model.sendMessage("Hello World");
 
+        //Assert
         WireMock.verify(postRequestedFor(urlEqualTo("/catChat"))
                 .withRequestBody(matching("Hello World")));
     }
 
+    /**
+     * Tests that a simulated incoming message (from the Spy) is correctly added
+     * to the ObservableList held by the model.
+     * This verifies the model's message handling flow.
+     */
     @Test
     void messageIsAddedToObservableList() {
+        //Arrange
         var spy = new NtfyConnectionSpy();
         var model = new HelloModel(spy);
 
+        //Act
         model.receiveMessage();
-        var testText = new NtfyMessageDto("id1", 15465823L,"Message", "catChat", "Godmorgon");
+        var testText = new NtfyMessageDto("id1", 15465823L, "Message", "catChat", "Godmorgon");
         spy.simulateIncomingMessage(testText);
 
+        //Assert
         assertThat(model.getMessages()).extracting(NtfyMessageDto::message).contains("Godmorgon");
     }
 

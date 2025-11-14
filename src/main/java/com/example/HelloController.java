@@ -10,7 +10,8 @@ import java.io.IOException;
 
 /**
  * Controller layer: mediates between the view (FXML) and the model.
- * Handles updates of the chat-window.
+ * Handles updates of the chat-window and manages UI,
+ * such as sending messages and connecting to server.
  */
 public class HelloController {
 
@@ -18,6 +19,8 @@ public class HelloController {
     private final HelloModel model = new HelloModel(new NtfyConnectionImpl());
 
     //@FXML kopplingar
+
+    //Knappar för uppkoppling
     @FXML
     private Button connectToServer;
 
@@ -37,7 +40,11 @@ public class HelloController {
     @FXML
     private ListView<NtfyMessageDto> chatBox;
 
-    //Metoden körs automatiskt när appen startar
+    /**
+     * Called automatically when the application starts (after FXML elements are injected).
+     * Sets up the initial state, attaches listeners to UI elements, and configures
+     * how messages should be displayed in the chatBox.
+     */
     @FXML
     private void initialize() {
 
@@ -75,13 +82,12 @@ public class HelloController {
             protected void updateItem(NtfyMessageDto item, boolean empty) {
                 super.updateItem(item, empty);
                 //Kräver en null check då JavaFX återanvänder cellerna
-               if (item == null || empty) {
-                   setText(null);
-                   setGraphic(null);
-            }
-            else{
-                //Skapar en label med meddelande-texten och sätter en stil från css
-                   Label label = new Label(item.message());
+                if (item == null || empty) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    //Skapar en label med meddelande-texten och sätter en stil från css
+                    Label label = new Label(item.message());
                     label.getStyleClass().add("message-bubble");
 
                     String time = item.formattedTime();
@@ -89,21 +95,21 @@ public class HelloController {
                     labelTime.getStyleClass().add("time-stamp");
 
                     //Layout
-                   VBox messageBox = new VBox(label, labelTime);
-                   messageBox.setSpacing(2);
+                    VBox messageBox = new VBox(label, labelTime);
+                    messageBox.setSpacing(2);
 
-                   //Vänster eller höger i ListView
-                   HBox hbox = new HBox(messageBox);
-                   hbox.setMaxWidth(chatBox.getWidth()-20);
+                    //Vänster eller höger i ListView
+                    HBox hbox = new HBox(messageBox);
+                    hbox.setMaxWidth(chatBox.getWidth() - 20);
 
-                   String messagePosition = item.message();
-                   if (messagePosition != null && messagePosition.startsWith("User:")) {
-                       hbox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
-                       label.getStyleClass().add("outgoing-message");
-                   } else {
-                       hbox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-                       label.getStyleClass().add("incoming-message");
-                   }
+                    String messagePosition = item.message();
+                    if (messagePosition != null && messagePosition.startsWith("User:")) {
+                        hbox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+                        label.getStyleClass().add("outgoing-message");
+                    } else {
+                        hbox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                        label.getStyleClass().add("incoming-message");
+                    }
                     setGraphic(hbox);
                 }
             }
@@ -116,6 +122,11 @@ public class HelloController {
         });
     }
 
+    /**
+     * Reads the text from the input field, sends the message to the model,
+     * and then clears the field.
+     * The message is sent only if the field is not empty.
+     */
     private void sendMessageToModel() {
         String outgoingMessage = messageInput.getText().trim();
         //Kontrollerar om text-fältet är tomt
@@ -126,6 +137,12 @@ public class HelloController {
         }
     }
 
+    /**
+     * Updates the state (disable/enable) of the Send button (sendButton).
+     * The button is enabled only if:
+     * 1. The text field contains text.
+     * 2. The application is connected to the server (disconnectFromServer is enabled).
+     */
     private void updateSendButtonState() {
         // Kollar om texten, efter att ha tagit bort ledande/efterföljande mellanslag, är tom.
         boolean isTextPresent = !messageInput.getText().trim().isEmpty();
@@ -137,9 +154,14 @@ public class HelloController {
         sendButton.setDisable(!isTextPresent || !isConnected);
     }
 
-    //Starta prenumeration via model och uppdaterar button
-    public void setConnectToServer() throws IOException{
-        if(disconnectFromServer.isDisable()) {
+    /**
+     * Starts the subscription to messages via HelloModel (connects to the server).
+     * Updates the status of the connection buttons.
+     *
+     * @throws IOException If an I/O error occurs during connection.
+     */
+    public void setConnectToServer() throws IOException {
+        if (disconnectFromServer.isDisable()) {
             model.receiveMessage();
             connectToServer.setDisable(true);
             disconnectFromServer.setDisable(false);
@@ -147,7 +169,12 @@ public class HelloController {
         }
     }
 
-    //Stoppar prenumerationen och uppdaterar button
+    /**
+     * Stops the subscription to messages via HelloModel (disconnects from the server).
+     * Updates the status of the connection buttons.
+     *
+     * @throws IOException If an I/O error occurs during disconnection.
+     */
     public void setDisconnectFromServer() throws IOException {
         model.stopSubscription();
         connectToServer.setDisable(false);

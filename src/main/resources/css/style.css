@@ -91,7 +91,7 @@
 }
 
 .sendButton {
-    -fx-background-colour: rgba(143, 61, 209, 0.6);
+    -fx-background-color: rgba(143, 61, 209, 0.6);
     -fx-text-fill: #0e0a0a;
     -fx-border-radius: 5;
     -fx-padding: 6px 12px;

@@ -1,7 +1,5 @@
 package com.example;
 
-import io.github.cdimascio.dotenv.Dotenv;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -12,6 +10,7 @@ import java.io.IOException;
 
 /**
  * Model layer: encapsulates application data and business logic.
+ * Manages message state and handles network communication through the NtfyConnection.
  */
 public class HelloModel {
     /**
@@ -30,7 +29,11 @@ public class HelloModel {
     //Fält för att kunna styra anslutningen
     private Subscription subscription = null;
 
-    //Konstruktorn tar emot nätverkskoppling, antingen ett test via spy eller en riktig via impl
+    /**
+     * Constructs the HelloModel with a specific network connection handler.
+     *
+     * @param connection The network connection implementation, either a test spy or a real implementation.
+     */
     public HelloModel(NtfyConnection connection) {
 
         this.connection = connection;
@@ -38,32 +41,63 @@ public class HelloModel {
     }
 
     //getter från private, används av controller för att koppla til ListView
+    /**
+     * Gets the list of messages. Used by the controller to link to the ListView.
+     *
+     * @return The ObservableList of messages.
+     */
     public ObservableList<NtfyMessageDto> getMessages() {
         return messages;
     }
-    //test
+
+    /**
+     * Gets the current value of the message to be sent.
+     *
+     * @return The current message string.
+     */
     public String getMessageToSend() {
         return messageToSend.get();
     }
-//Getter från private för meddelandet som ska skickas
+    /**
+     * Returns the StringProperty for the message to be sent.
+     *
+     * @return The message property.
+     */
     public StringProperty messageToSendProperty() {
         return messageToSend;
     }
-//Sätter meddelande för tester
+
+    /**
+     * Sets the message to be sent. (Used primarily for testing).
+     *
+     * @param message The message string to set.
+     */
     public void setMessageToSend(String message) {
         messageToSend.set(message);
     }
 
-    //Sätter meddelandet till inkommande parameter från test, eller controller (connection skickar till nätverket)
+    /**
+     * Sets the message property and immediately sends the message via the network connection.
+     *
+     * @param message The message content to be sent.
+     */
     public void sendMessage(String message) {
 
+        //För test via spy
         messageToSend.set(message);
+        //Riktig chat
         connection.send(messageToSend.get());
 
     }
 
     //Startar en prenumeration på inkommande meddelanden,
     //Returnerar ett Subscription-objekt så den kan stoppas
+    /**
+     * Starts a subscription for incoming messages from the network.
+     * If a subscription is already active and open, it returns the existing one.
+     *
+     * @return The active Subscription object.
+     */
     public Subscription receiveMessage() {
 if(subscription != null && subscription.isOpen()) {
     return subscription;
@@ -73,6 +107,11 @@ if(subscription != null && subscription.isOpen()) {
 
     }
 
+    /**
+     * Stops the active message subscription if it is currently open.
+     *
+     * @throws IOException If an I/O error occurs during the closing of the subscription.
+     */
     public void stopSubscription() throws IOException {
         if (subscription != null && subscription.isOpen())
             subscription.close();
