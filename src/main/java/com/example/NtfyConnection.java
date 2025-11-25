@@ -1,5 +1,6 @@
 package com.example;
 
+import java.nio.file.Path;
 import java.util.function.Consumer;
 
 /**
@@ -24,5 +25,7 @@ public interface NtfyConnection {
      * @return A Subscription object that can be used to stop the stream connection.
      */
     Subscription receive(Consumer<NtfyMessageDto> consumer);
+
+    boolean sendFile(Path file, String message);
 
 }

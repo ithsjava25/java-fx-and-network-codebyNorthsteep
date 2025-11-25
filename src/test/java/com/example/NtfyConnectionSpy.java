@@ -1,5 +1,6 @@
 package com.example;
 
+import java.nio.file.Path;
 import java.util.function.Consumer;
 
 /**
@@ -10,6 +11,7 @@ import java.util.function.Consumer;
 public class NtfyConnectionSpy implements NtfyConnection {
     //Meddelande som skickas
     String message;
+    Path file;
     //funktionen som ska köras när ett meddelande kommer
     Consumer<NtfyMessageDto> consumer;
 
@@ -51,6 +53,19 @@ public class NtfyConnectionSpy implements NtfyConnection {
                 return open;
             }
         };
+    }
+
+    /**
+     * Simulates sending an outgoing file with a message
+     *
+     * @param file The file being sent
+     * @param message The message to the file
+     * @return Always returns false or true (return value often ignored in spy tests).
+     */
+    @Override
+    public boolean sendFile(Path file, String message) {
+        this.file = file;
+        return false;
     }
 
     /**

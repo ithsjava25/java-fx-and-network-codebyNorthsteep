@@ -5,8 +5,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * Controller layer: mediates between the view (FXML) and the model.
@@ -26,6 +29,10 @@ public class HelloController {
 
     @FXML
     private Button disconnectFromServer;
+
+    //Kopplar en knapp från FXML för att skicka filer
+    @FXML
+    private Button sendFile;
 
     //Kopplar ett textfält från FXML där användaren skriver ett meddelande
     @FXML
@@ -57,6 +64,7 @@ public class HelloController {
         //Om användaren trycker på Enter eller klickar med musen -> skicka meddelandet
         messageInput.setOnAction((event) -> sendMessageToModel());
         sendButton.setOnAction(event -> sendMessageToModel());
+        sendFile.setOnAction(event -> sendFileToModel());
 
         disconnectFromServer.setOnAction(event -> {
             try {
@@ -74,8 +82,7 @@ public class HelloController {
         });
 
         disconnectFromServer.setDisable(true);
-
-        //model.receiveMessage();
+        
         //Styr hur varje meddelande ska visas i chatboxen
         chatBox.setCellFactory(listView -> new ListCell<>() {
             @Override
@@ -138,6 +145,15 @@ public class HelloController {
         }
     }
 
+    private void sendFileToModel() {
+        boolean isConnected = !disconnectFromServer.isDisabled();
+        FileChooser chooseFile = new FileChooser();
+        File file = chooseFile.showOpenDialog(sendFile.getScene().getWindow());
+        if (isConnected && file != null) {
+            model.sendFile(file.toPath(), "User: You got sent a file");
+        }
+    }
+
     /**
      * Updates the state (disable/enable) of the Send button (sendButton).
      * The button is enabled only if:
@@ -148,11 +164,13 @@ public class HelloController {
         // Kollar om texten, efter att ha tagit bort ledande/efterföljande mellanslag, är tom.
         boolean isTextPresent = !messageInput.getText().trim().isEmpty();
 
-        //Nytt villkor för button för att ej kunna skicka meddelanden till servern om ej connectad
+        //Nytt villkor för button för att ej kunna skicka meddelanden till servern om ej connected
         boolean isConnected = !disconnectFromServer.isDisabled();
 
-        // Sätt disable till TRUE om det INTE finns text.
+        // Sätt disable till TRUE om det INTE finns text eller att servern ej är uppkopplad.
         sendButton.setDisable(!isTextPresent || !isConnected);
+        // Sätt disable till TRUE om servern ej är uppkopplad.
+        sendFile.setDisable(!isConnected);
     }
 
     /**
@@ -167,6 +185,7 @@ public class HelloController {
             connectToServer.setDisable(true);
             disconnectFromServer.setDisable(false);
             updateSendButtonState();
+
         }
     }
 

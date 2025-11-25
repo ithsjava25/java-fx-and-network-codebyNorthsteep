@@ -4,11 +4,14 @@ import io.github.cdimascio.dotenv.Dotenv;
 import javafx.application.Platform;
 import tools.jackson.databind.ObjectMapper;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -79,7 +82,7 @@ public class NtfyConnectionImpl implements NtfyConnection {
      * @return A Subscription object that can be used to stop the stream (cancel the connection).
      */
     @Override
-    public Subscription receive(Consumer<NtfyMessageDto> messageHandler) {
+    public Subscription receive(Consumer<NtfyMessageDto> messageHandler) throws UncheckedIOException {
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .GET()
                 .uri(URI.create(hostName + "/catChat/json"))
@@ -102,6 +105,31 @@ public class NtfyConnectionImpl implements NtfyConnection {
                 return !connected.isDone();
             }
         };
+    }
+
+    @Override
+    public boolean sendFile(Path file, String message) {
+        //Send message to client - HTTP meddelande
+        String inputMessage = Objects.requireNonNull(message);
+          try {
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofFile(file))
+                .header("Title", inputMessage)
+                .header("Cache-Control", "no-cache")
+                .uri(URI.create(hostName + "/catChat"))
+                .build();
+
+            var response = http.send(httpRequest, HttpResponse.BodyHandlers.discarding());
+            return true;
+        }  catch (FileNotFoundException e) {
+            System.out.println("Error sending File");
+        }
+        catch (IOException e) {
+            System.out.println("Error sending message");
+        } catch (InterruptedException e) {
+            System.out.println("Sending message interrupted");
+        }
+        return false;
     }
 
     /**

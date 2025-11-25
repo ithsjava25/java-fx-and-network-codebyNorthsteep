@@ -6,6 +6,8 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,7 +62,7 @@ class HelloModelTest {
                 .withBody(fakeMessage)));
         var model = new HelloModel(host);
 
-//        //Act
+        //Act
 
         model.receiveMessage();
 
@@ -115,5 +117,27 @@ class HelloModelTest {
         assertThat(model.getMessages()).extracting(NtfyMessageDto::message).contains("Godmorgon");
     }
 
+    /**
+     * Verifies that calling sendFile() sends a correct HTTP POST request
+     * to the simulated server, including the message content as the 'Title' header
+     * and the file's content in the request body.
+     *
+     * @param wmRuntimeInfo Provides port information for the simulated server.
+     */
+    @Test
+    void sendFileToFakeServer(WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
+        //Arrange
+        var con = new NtfyConnectionImpl("http://localhost:" + wmRuntimeInfo.getHttpPort());
+        var model = new HelloModel(con);
+        Path fakeFile = Files.createTempFile("fakeImage", ".png");
+        Files.writeString(fakeFile, "TestFile");
+        stubFor(post("/catChat").willReturn(ok()));
 
+        //Act
+        model.sendFile(fakeFile, "TestFile");
+
+        //Assert
+        WireMock.verify(postRequestedFor(urlEqualTo("/catChat"))
+                .withRequestBody(containing("TestFile")));
+    }
 }

@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 
 /**
@@ -105,6 +106,10 @@ if(subscription != null && subscription.isOpen()) {
     return subscription = connection.receive(messages::add);
 
 
+    }
+
+    public void sendFile(Path file, String message) {
+        connection.sendFile(file, message);
     }
 
     /**

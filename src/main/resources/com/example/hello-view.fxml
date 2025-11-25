@@ -25,6 +25,7 @@
         <HBox alignment="CENTER_LEFT" styleClass="input-bar">
             <TextField fx:id="messageInput" promptText="Skriv ett meddelande..." styleClass="text-field" HBox.hgrow="ALWAYS" />
             <Button fx:id="sendButton" text="Skicka" styleClass="sendButton"/>
+            <Button fx:id="sendFile" text="Skicka fil" styleClass="sendButton"/>
         </HBox>
     </bottom>
 
