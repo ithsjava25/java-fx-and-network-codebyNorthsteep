@@ -145,6 +145,11 @@ public class HelloController {
         }
     }
 
+    /**
+     * Opens a file chooser dialog and, if a file is selected, sends the file
+     * and a default descriptive message to the model.
+     * The operation is executed only if the client is connected to the server.
+     */
     private void sendFileToModel() {
         boolean isConnected = !disconnectFromServer.isDisabled();
         FileChooser chooseFile = new FileChooser();

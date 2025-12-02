@@ -107,6 +107,14 @@ public class NtfyConnectionImpl implements NtfyConnection {
         };
     }
 
+    /**
+     * Sends a chosen file and text message to the server via an HTTP POST request.
+     * This is sent to the 'catChat' topic.
+     *
+     * @param message The text message content to send.
+     * @param file The file chosen to send.
+     * @return true if the request was sent without an immediate error, false otherwise.
+     */
     @Override
     public boolean sendFile(Path file, String message) {
         //Send message to client - HTTP meddelande
