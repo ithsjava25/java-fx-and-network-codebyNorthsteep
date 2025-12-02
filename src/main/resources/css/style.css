@@ -1,0 +1,120 @@
+/* --- ROOT/GLOBAL STYLING --- */
+.root {
+    -fx-background-image: url("../cat_pattern.png");
+    -fx-background-size: cover;
+    -fx-padding: 20;
+}
+
+/* --- TOP --- */
+.top-bar {
+    -fx-pref-height: 50px;
+    -fx-background-color: transparent;
+}
+
+.title-bar {
+    -fx-text-fill: #d91d5f;
+    -fx-font-family: "Britannic Bold";
+    -fx-font-size: 36;
+}
+
+/* --- CENTER (Chatt Bubblor & Container) --- */
+
+/* Containern som håller alla meddelanden (VBox inuti ScrollPane) */
+.chat-box-container {
+    -fx-spacing: 10px;
+    -fx-padding: 10px;
+    -fx-background: transparent;
+    -fx-background-color: rgba(255, 255, 255, 0.6);
+    -fx-background-radius: 5;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+}
+
+.message-bubble {
+    -fx-background-color: rgb(217, 29, 95);
+    -fx-text-fill: white;
+    -fx-padding: 8px 12px;
+    -fx-background-radius: 10;
+    -fx-wrap-text: true;
+    -fx-max-width: 200px;
+    -fx-font-family: "Century Gothic";
+}
+
+.incoming-message {
+    -fx-background-color: black;
+    -fx-text-fill: white;
+
+}
+
+.outgoing-message {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #0e0a0a;
+}
+
+.time-stamp {
+    -fx-font-size: 10px;
+    -fx-text-fill: #d91d5f;
+    -fx-padding: 8px 12px;
+}
+
+
+/* --- BOTTOM (Inputfält & Knapp) --- */
+
+/* Containern för inputfältet och Skicka-knappen */
+.input-bar {
+    -fx-spacing: 10px;
+    -fx-padding: 10px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.text-field {
+    -fx-pref-height: 50px;
+    -fx-background-color: black;
+    -fx-text-fill: #f1eeee;
+    -fx-prompt-text-fill: #efe9e9;
+    -fx-border-color: #444;
+    -fx-border-radius: 5;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 5, 0, 0, 0);
+}
+
+.text-field:focused {
+    -fx-border-color: #d91d5f;
+    -fx-effect: innershadow(gaussian, rgba(217, 29, 95, 0.8), 8, 0, 0, 0);
+}
+
+.text-field:hover {
+    -fx-border-color: #d91d5f;
+    -fx-effect: innershadow(gaussian, rgba(217, 29, 95, 0.8), 8, 0, 0, 0);
+}
+
+.sendButton {
+    -fx-background-color: rgba(143, 61, 209, 0.6);
+    -fx-text-fill: #0e0a0a;
+    -fx-border-radius: 5;
+    -fx-padding: 6px 12px;
+}
+.button:hover {
+    -fx-background-color: #3A3A3A;
+    -fx-text-fill: #d91d5f;
+    -fx-border-radius: 5;
+    -fx-padding: 6px 12px;
+}
+
+
+.connectionButton {
+    -fx-background-color: #3A3A3A;
+    -fx-text-fill: #d8cbcb;
+    -fx-border-radius: 5;
+    -fx-padding: 6px 12px;
+}
+
+.tool-bar {
+    -fx-spacing: 10px;
+    -fx-padding: 10px;
+    -fx-background: transparent;
+    -fx-background-color: rgba(255, 255, 255, 0.6);
+    -fx-background-radius: 5;
+}
